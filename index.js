@@ -20,14 +20,33 @@ app.use(express.urlencoded({ extended: true }))
 
 //MIDDLEWARE LOGGING
 app.use((req, res, next) => {
-    const duration = Date.now() - start
+    const start = Date.now()
 
-    console.log({
-        method: req.method,
-        url: req.originalUrl,
-        status: res.statusCode,
-        duration: `${duration}ms`,
+    res.on('finish', () => {
+        const duration = Date.now() - start
+
+        console.log({
+            method: req.method,
+            url: req.originalUrl,
+            status: res.statusCode,
+            duration: `${duration}ms`,
+        })
     })
+
+    next()
 })
+
+//RESPONSE ENVELOPE
+
+function responseEnvelope(res, message, data , status = 200) {
+    return res.status(status).json({
+        success : true,
+        message,
+        data,
+        error: null,
+    })
+}
+
+
 
     
